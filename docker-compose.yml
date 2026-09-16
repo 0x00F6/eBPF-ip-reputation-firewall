@@ -1,0 +1,135 @@
+services:
+  # ============================================================================
+  # 🛡️ High-Performance eBPF IP Reputation Firewall (Aya / XDP)
+  # ============================================================================
+  firewall:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ebpf-firewall
+    privileged: true
+    cap_add:
+      - NET_ADMIN
+      - BPF
+    # The firewall registers its SIGTERM handler only AFTER the FireHOL startup
+    # sync (which can take tens of seconds), so a stop landing during startup
+    # would otherwise wait the full default 10s grace period. Cap it short:
+    stop_grace_period: 3s
+    environment:
+      - NO_COLOR=false
+      - FIREWALL_NO_COLOR=false
+      - RUST_LOG=info,firewall=info
+      - FIREWALL_IFACE=eth0
+      - FIREWALL_RULES=/app/rules/blocklist.txt,/app/rules/blocklist_v6.txt,/app/rules/cidr_ranges.txt
+      - METRICS_LISTEN_ADDRESS=0.0.0.0:9100
+      - FIREHOL_UPDATE_CRON=0 0 * * * *
+      - FIREWALL_EBPF_PATH=/app/firewall-ebpf
+      - FIREHOL_IGNORE_IP=172.28.0.3,172.28.0.1
+    volumes:
+      - /sys/fs/bpf:/sys/fs/bpf:rw
+      - /sys/kernel/debug:/sys/kernel/debug:rw
+      - ./rules:/app/rules:rw
+    ports:
+      - "9100:9100"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:9100/metrics | grep -q '^firewall_up 1$'"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    networks:
+      firewall-net:
+        ipv4_address: 172.28.0.2
+    restart: unless-stopped
+
+  # ============================================================================
+  # 📈 Prometheus Metrics Scraper & Time-Series Database
+  # ============================================================================
+  prometheus:
+    image: prom/prometheus:v3.2.1
+    container_name: prometheus
+    command:
+      - "--log.level=error"
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=15d"
+      - "--web.enable-lifecycle"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      firewall-net:
+        ipv4_address: 172.28.0.3
+    restart: unless-stopped
+    depends_on:
+      - firewall
+
+  # ============================================================================
+  # 📊 Grafana Observability Dashboard
+  # ============================================================================
+  grafana:
+    image: grafana/grafana:11.5.2
+    container_name: grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+      - GF_USERS_DEFAULT_LANGUAGE=fr-FR
+      - GF_DATE_FORMATS_USE_BROWSER_LOCALE=true
+      - GF_LOG_LEVEL=error
+      - GF_PANELS_DISABLE_SANITIZE_HTML=true
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      firewall-net:
+        ipv4_address: 172.28.0.4
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+
+  # ============================================================================
+  # 🧪 Automated Network Traffic Generator & Performance Benchmark
+  # ============================================================================
+  traffic-generator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: traffic-generator
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    # Use an init process (docker-init / tini) so that Ctrl+C / docker stop can
+    # properly forward SIGINT/SIGTERM to the container's process tree and reap
+    # orphaned children instead of waiting for the full stop_grace_period.
+    init: true
+    stop_grace_period: 1s
+    entrypoint: ["/bin/bash", "-c", "trap 'echo \"traffic-generator: received signal, shutting down...\"; exit 0' INT TERM; sleep infinity & wait $!"]
+    volumes:
+      - ./rules:/app/rules:rw
+    networks:
+      firewall-net:
+        ipv4_address: 172.28.0.10
+    depends_on:
+      - firewall
+    restart: unless-stopped
+
+networks:
+  firewall-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16
+
+volumes:
+  prometheus-data:
+  grafana-data:

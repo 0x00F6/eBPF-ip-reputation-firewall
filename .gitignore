@@ -1,0 +1,27 @@
+# Rust build artifacts
+**/target/
+**/firehol-blocklist-ipset/
+coverage/
+*.profraw
+
+# IDEs
+.vscode/
+.idea/
+
+# Rust backup files
+**/*.rs.bk
+
+# Environment files
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# FireHOL repository checkout
+rules/firehol-blocklist-ipsets/
+cache
+bench-baseline
+bench-baseline-after
+bench-baseline-before

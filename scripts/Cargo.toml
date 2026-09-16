@@ -1,0 +1,30 @@
+[package]
+name = "traffic-tools"
+version = "0.1.0"
+edition = "2021"
+authors = ["Firewall Team"]
+description = "Traffic testing and high-speed multi-threaded benchmarking tools for eBPF firewall"
+
+[lib]
+name = "traffic_tools_common"
+path = "common/src/lib.rs"
+bench = false
+
+[[bin]]
+name = "test_traffic"
+path = "test_traffic/src/main.rs"
+bench = false
+
+[[bin]]
+name = "benchmark"
+path = "benchmark/src/main.rs"
+bench = false
+
+[dependencies]
+clap = { version = "4.5", features = ["derive", "env", "color"] }
+libc = "0.2"
+pretty-console = "1.0.3"
+socket2 = "0.5"
+
+[dev-dependencies]
+tempfile = "3.16"

@@ -1,0 +1,336 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1150 720" width="100%" height="100%" style="background:#090d16; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <!-- Filters -->
+    <filter id="shadow" x="-8%" y="-8%" width="116%" height="116%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+    <filter id="glow-green" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#10b981" flood-opacity="0.6"/>
+    </filter>
+    <filter id="glow-purple" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#a855f7" flood-opacity="0.6"/>
+    </filter>
+    <filter id="glow-cyan" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#38bdf8" flood-opacity="0.6"/>
+    </filter>
+
+    <!-- Gradients -->
+    <linearGradient id="card-tier1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#064e3b"/>
+      <stop offset="100%" stop-color="#022c22"/>
+    </linearGradient>
+    <linearGradient id="card-tier2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#083344"/>
+      <stop offset="100%" stop-color="#041d27"/>
+    </linearGradient>
+    <linearGradient id="card-ringbuf" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2e1065"/>
+      <stop offset="100%" stop-color="#180736"/>
+    </linearGradient>
+    <linearGradient id="card-stats" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#312e81"/>
+      <stop offset="100%" stop-color="#151340"/>
+    </linearGradient>
+
+    <!-- Arrow markers -->
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#10b981"/>
+    </marker>
+    <marker id="arrow-cyan" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8"/>
+    </marker>
+    <marker id="arrow-purple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#c084fc"/>
+    </marker>
+
+    <!-- Background Pattern -->
+    <pattern id="dot-grid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#1e293b" opacity="0.6"/>
+    </pattern>
+
+    <!-- Icons -->
+    <g id="icon-hash">
+      <rect x="3" y="3" width="18" height="18" rx="3" fill="#10b981" opacity="0.2"/>
+      <line x1="8" y1="4" x2="8" y2="20" stroke="#10b981" stroke-width="1.8"/>
+      <line x1="16" y1="4" x2="16" y2="20" stroke="#10b981" stroke-width="1.8"/>
+      <line x1="4" y1="9" x2="20" y2="9" stroke="#10b981" stroke-width="1.8"/>
+      <line x1="4" y1="15" x2="20" y2="15" stroke="#10b981" stroke-width="1.8"/>
+    </g>
+
+    <g id="icon-trie">
+      <circle cx="12" cy="5" r="2.5" fill="#38bdf8"/>
+      <circle cx="7" cy="12" r="2" fill="#7dd3fc"/>
+      <circle cx="17" cy="12" r="2" fill="#7dd3fc"/>
+      <circle cx="4" cy="19" r="1.8" fill="#bae6fd"/>
+      <circle cx="10" cy="19" r="1.8" fill="#bae6fd"/>
+      <line x1="12" y1="7.5" x2="7" y2="10" stroke="#38bdf8" stroke-width="1.3"/>
+      <line x1="12" y1="7.5" x2="17" y2="10" stroke="#38bdf8" stroke-width="1.3"/>
+      <line x1="7" y1="14" x2="4" y2="17.2" stroke="#7dd3fc" stroke-width="1.3"/>
+      <line x1="7" y1="14" x2="10" y2="17.2" stroke="#7dd3fc" stroke-width="1.3"/>
+    </g>
+
+    <g id="icon-ringbuf">
+      <circle cx="12" cy="12" r="8" fill="none" stroke="#c084fc" stroke-width="2" stroke-dasharray="3 2"/>
+      <circle cx="12" cy="4" r="2" fill="#a855f7"/>
+      <circle cx="20" cy="12" r="2" fill="#c084fc"/>
+      <circle cx="12" cy="20" r="2" fill="#e879f9"/>
+      <circle cx="4" cy="12" r="2" fill="#a855f7"/>
+    </g>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="100%" height="100%" fill="#090d16"/>
+  <rect width="100%" height="100%" fill="url(#dot-grid)"/>
+
+  <!-- ==================== HEADER BAR ==================== -->
+  <g transform="translate(40, 20)">
+    <text x="0" y="24" font-size="20" font-weight="800" fill="#f8fafc" letter-spacing="0.5">
+      eBPF MAP DATA STRUCTURES &amp; MEMORY ARCHITECTURE
+    </text>
+    <text x="0" y="44" font-size="12" font-weight="500" fill="#64748b">
+      Dual-Tier Matching Hierarchy (O(1) Exact Hash &amp; LPM Trie) • Lockless 64B RingBuffer • Atomic Stats Array
+    </text>
+
+    <!-- Top Badges -->
+    <g transform="translate(710, 5)">
+      <rect width="185" height="26" rx="6" fill="#064e3b" stroke="#10b981" stroke-width="1"/>
+      <text x="12" y="17" font-size="11" font-weight="700" fill="#a7f3d0">🎯 Dual-Tier Match Engine</text>
+
+      <rect x="195" width="185" height="26" rx="6" fill="#2e1065" stroke="#c084fc" stroke-width="1"/>
+      <text x="207" y="17" font-size="11" font-weight="700" fill="#e9d5ff">⚡ 64B Cacheline RingBuf</text>
+    </g>
+  </g>
+
+  <!-- ==================== MAIN CARDS GRID ==================== -->
+  <g transform="translate(40, 85)">
+    <!-- Container Outline -->
+    <rect width="1070" height="605" rx="14" fill="#0c1220" stroke="#1e293b" stroke-width="1.5" filter="url(#shadow)"/>
+
+    <!-- ==================== CARD 1: TIER 1 EXACT MATCH (HASH MAPS) ==================== -->
+    <g transform="translate(25, 25)">
+      <rect width="500" height="265" rx="12" fill="url(#card-tier1)" stroke="#10b981" stroke-width="2" filter="url(#glow-green)"/>
+      <use href="#icon-hash" x="16" y="14" width="24" height="24"/>
+      <text x="46" y="31" font-size="14" font-weight="800" fill="#a7f3d0">TIER 1: EXACT MATCH HASH MAPS</text>
+      
+      <!-- Sub-badge -->
+      <rect x="360" y="14" width="125" height="22" rx="5" fill="#047857" fill-opacity="0.4" stroke="#34d399" stroke-width="1"/>
+      <text x="370" y="29" font-size="10" font-family="monospace" font-weight="700" fill="#6ee7b7">O(1) FAST PATH</text>
+
+      <text x="16" y="58" font-size="10.5" fill="#cbd5e1">
+        Constant-time lookup covering ~95% of discrete threat feeds (/32 IPv4 &amp; /128 IPv6).
+      </text>
+
+      <!-- Tables Grid: IPV4_EXACT vs IPV6_EXACT -->
+      <g transform="translate(14, 75)">
+        <!-- IPv4 Exact Map -->
+        <rect width="225" height="135" rx="6" fill="#022c22" stroke="#059669" stroke-width="1.2"/>
+        <text x="12" y="22" font-size="12" font-weight="700" fill="#6ee7b7">IPV4_EXACT_MAP</text>
+        <text x="12" y="40" font-size="9.5" font-family="monospace" fill="#34d399">BPF_MAP_TYPE_HASH</text>
+        
+        <text x="12" y="62" font-size="10" fill="#94a3b8">Key Type: <tspan font-family="monospace" fill="#e2e8f0">[u8; 4] (4B IPv4)</tspan></text>
+        <text x="12" y="80" font-size="10" fill="#94a3b8">Value: <tspan font-family="monospace" fill="#e2e8f0">RuleValue (8B)</tspan></text>
+        <text x="12" y="98" font-size="10" fill="#94a3b8">Max Entries: <tspan font-weight="700" fill="#34d399">131,072</tspan></text>
+        <text x="12" y="118" font-size="9" fill="#a7f3d0">Target: Discrete /32 Hosts</text>
+
+        <!-- IPv6 Exact Map -->
+        <g transform="translate(235, 0)">
+          <rect width="225" height="135" rx="6" fill="#022c22" stroke="#059669" stroke-width="1.2"/>
+          <text x="12" y="22" font-size="12" font-weight="700" fill="#6ee7b7">IPV6_EXACT_MAP</text>
+          <text x="12" y="40" font-size="9.5" font-family="monospace" fill="#34d399">BPF_MAP_TYPE_HASH</text>
+          
+          <text x="12" y="62" font-size="10" fill="#94a3b8">Key Type: <tspan font-family="monospace" fill="#e2e8f0">[u8; 16] (16B IPv6)</tspan></text>
+          <text x="12" y="80" font-size="10" fill="#94a3b8">Value: <tspan font-family="monospace" fill="#e2e8f0">RuleValue (8B)</tspan></text>
+          <text x="12" y="98" font-size="10" fill="#94a3b8">Max Entries: <tspan font-weight="700" fill="#34d399">65,536</tspan></text>
+          <text x="12" y="118" font-size="9" fill="#a7f3d0">Target: Discrete /128 Hosts</text>
+        </g>
+      </g>
+
+      <!-- RuleValue Structure Pill at bottom -->
+      <g transform="translate(14, 222)">
+        <rect width="462" height="30" rx="4" fill="#011f18" stroke="#10b981" stroke-width="1"/>
+        <text x="12" y="19" font-size="10" font-family="monospace" fill="#a7f3d0">
+          RuleValue { rule_id: u32, action: u8, flags: u8, _pad: [u8; 2] } // 8 Bytes
+        </text>
+      </g>
+    </g>
+
+    <!-- ==================== CARD 2: TIER 2 CIDR MATCH (LPM TRIES) ==================== -->
+    <g transform="translate(545, 25)">
+      <rect width="500" height="265" rx="12" fill="url(#card-tier2)" stroke="#0ea5e9" stroke-width="2" filter="url(#glow-cyan)"/>
+      <use href="#icon-trie" x="16" y="14" width="24" height="24"/>
+      <text x="46" y="31" font-size="14" font-weight="800" fill="#7dd3fc">TIER 2: LONGEST PREFIX MATCH TRIES</text>
+
+      <rect x="360" y="14" width="125" height="22" rx="5" fill="#0284c7" fill-opacity="0.3" stroke="#38bdf8" stroke-width="1"/>
+      <text x="368" y="29" font-size="10" font-family="monospace" font-weight="700" fill="#38bdf8">LPM TRIE SUBNETS</text>
+
+      <text x="16" y="58" font-size="10.5" fill="#cbd5e1">
+        Evaluates arbitrary CIDR subnet blocks (e.g. /8, /24, /48) on Tier 1 hash miss.
+      </text>
+
+      <!-- Tables Grid: IPV4_LPM vs IPV6_LPM -->
+      <g transform="translate(14, 75)">
+        <!-- IPv4 LPM Map -->
+        <rect width="225" height="135" rx="6" fill="#041f2e" stroke="#0284c7" stroke-width="1.2"/>
+        <text x="12" y="22" font-size="12" font-weight="700" fill="#38bdf8">IPV4_LPM_MAP</text>
+        <text x="12" y="40" font-size="9.5" font-family="monospace" fill="#0284c7">BPF_MAP_TYPE_LPM_TRIE</text>
+        
+        <text x="12" y="62" font-size="10" fill="#94a3b8">Key Type: <tspan font-family="monospace" fill="#e2e8f0">LpmKeyV4 (8B)</tspan></text>
+        <text x="12" y="80" font-size="10" fill="#94a3b8">Value: <tspan font-family="monospace" fill="#e2e8f0">RuleValue (8B)</tspan></text>
+        <text x="12" y="98" font-size="10" fill="#94a3b8">Max Entries: <tspan font-weight="700" fill="#38bdf8">65,536</tspan></text>
+        <text x="12" y="118" font-size="9" fill="#7dd3fc">Prefixes: /8 – /31 Subnets</text>
+
+        <!-- IPv6 LPM Map -->
+        <g transform="translate(235, 0)">
+          <rect width="225" height="135" rx="6" fill="#041f2e" stroke="#0284c7" stroke-width="1.2"/>
+          <text x="12" y="22" font-size="12" font-weight="700" fill="#38bdf8">IPV6_LPM_MAP</text>
+          <text x="12" y="40" font-size="9.5" font-family="monospace" fill="#0284c7">BPF_MAP_TYPE_LPM_TRIE</text>
+          
+          <text x="12" y="62" font-size="10" fill="#94a3b8">Key Type: <tspan font-family="monospace" fill="#e2e8f0">LpmKeyV6 (20B)</tspan></text>
+          <text x="12" y="80" font-size="10" fill="#94a3b8">Value: <tspan font-family="monospace" fill="#e2e8f0">RuleValue (8B)</tspan></text>
+          <text x="12" y="98" font-size="10" fill="#94a3b8">Max Entries: <tspan font-weight="700" fill="#38bdf8">32,768</tspan></text>
+          <text x="12" y="118" font-size="9" fill="#7dd3fc">Prefixes: /16 – /127 Subnets</text>
+        </g>
+      </g>
+
+      <!-- LpmKey Structure Pill at bottom -->
+      <g transform="translate(14, 222)">
+        <rect width="462" height="30" rx="4" fill="#021724" stroke="#0ea5e9" stroke-width="1"/>
+        <text x="12" y="19" font-size="10" font-family="monospace" fill="#7dd3fc">
+          LpmKey&lt;T&gt; { prefixlen: u32, data: T } // Kernel longest-prefix matching
+        </text>
+      </g>
+    </g>
+
+    <!-- ==================== CARD 3: EVENTS RING BUFFER (BOTTOM-LEFT) ==================== -->
+    <g transform="translate(25, 310)">
+      <rect width="640" height="265" rx="12" fill="url(#card-ringbuf)" stroke="#c084fc" stroke-width="2" filter="url(#glow-purple)"/>
+      <use href="#icon-ringbuf" x="16" y="14" width="24" height="24"/>
+      <text x="46" y="31" font-size="14" font-weight="800" fill="#e9d5ff">EVENTS RING BUFFER (TELEMETRY STREAM)</text>
+
+      <rect x="495" y="14" width="130" height="22" rx="5" fill="#581c87" stroke="#c084fc" stroke-width="1"/>
+      <text x="505" y="29" font-size="10" font-family="monospace" font-weight="700" fill="#f5d0fe">64B CACHELINE</text>
+
+      <text x="16" y="58" font-size="10.5" fill="#e2e8f0">
+        Lockless memory ring buffer (Linux 5.8+) emitting drop events with exact 64-byte L1 CPU alignment.
+      </text>
+
+      <!-- Memory Layout Box (64 Bytes Representation) -->
+      <g transform="translate(14, 75)">
+        <rect width="612" height="115" rx="6" fill="#140728" stroke="#a855f7" stroke-width="1.2"/>
+        <text x="12" y="20" font-size="11" font-weight="700" fill="#f5d0fe">PacketLogEvent Memory Layout (Strict 64 Bytes • #[repr(C)]):</text>
+
+        <!-- Memory Blocks Visualization -->
+        <g transform="translate(12, 32)">
+          <!-- timestamp (8B) -->
+          <rect width="75" height="42" rx="4" fill="#3b0764" stroke="#c084fc" stroke-width="1"/>
+          <text x="37" y="18" text-anchor="middle" font-size="9" font-family="monospace" font-weight="700" fill="#f5d0fe">timestamp</text>
+          <text x="37" y="32" text-anchor="middle" font-size="8.5" fill="#d8b4fe">u64 (8B)</text>
+
+          <!-- src_ip (16B) -->
+          <g transform="translate(80, 0)">
+            <rect width="105" height="42" rx="4" fill="#3b0764" stroke="#c084fc" stroke-width="1"/>
+            <text x="52" y="18" text-anchor="middle" font-size="9" font-family="monospace" font-weight="700" fill="#f5d0fe">src_ip</text>
+            <text x="52" y="32" text-anchor="middle" font-size="8.5" fill="#d8b4fe">[u8; 16] (16B)</text>
+          </g>
+
+          <!-- dst_ip (16B) -->
+          <g transform="translate(190, 0)">
+            <rect width="105" height="42" rx="4" fill="#3b0764" stroke="#c084fc" stroke-width="1"/>
+            <text x="52" y="18" text-anchor="middle" font-size="9" font-family="monospace" font-weight="700" fill="#f5d0fe">dst_ip</text>
+            <text x="52" y="32" text-anchor="middle" font-size="8.5" fill="#d8b4fe">[u8; 16] (16B)</text>
+          </g>
+
+          <!-- ports (4B) -->
+          <g transform="translate(300, 0)">
+            <rect width="65" height="42" rx="4" fill="#3b0764" stroke="#c084fc" stroke-width="1"/>
+            <text x="32" y="18" text-anchor="middle" font-size="9" font-family="monospace" font-weight="700" fill="#f5d0fe">ports</text>
+            <text x="32" y="32" text-anchor="middle" font-size="8.5" fill="#d8b4fe">2x u16 (4B)</text>
+          </g>
+
+          <!-- proto + action (2B) -->
+          <g transform="translate(370, 0)">
+            <rect width="70" height="42" rx="4" fill="#3b0764" stroke="#c084fc" stroke-width="1"/>
+            <text x="35" y="18" text-anchor="middle" font-size="9" font-family="monospace" font-weight="700" fill="#f5d0fe">proto/act</text>
+            <text x="35" y="32" text-anchor="middle" font-size="8.5" fill="#d8b4fe">2x u8 (2B)</text>
+          </g>
+
+          <!-- rule_id + len (6B) -->
+          <g transform="translate(445, 0)">
+            <rect width="75" height="42" rx="4" fill="#3b0764" stroke="#c084fc" stroke-width="1"/>
+            <text x="37" y="18" text-anchor="middle" font-size="9" font-family="monospace" font-weight="700" fill="#f5d0fe">rule_id/len</text>
+            <text x="37" y="32" text-anchor="middle" font-size="8.5" fill="#d8b4fe">u32+u16 (6B)</text>
+          </g>
+
+          <!-- match_type + pad (12B) -->
+          <g transform="translate(525, 0)">
+            <rect width="60" height="42" rx="4" fill="#2e1065" stroke="#a855f7" stroke-width="1"/>
+            <text x="30" y="18" text-anchor="middle" font-size="9" font-family="monospace" font-weight="700" fill="#f5d0fe">match/pad</text>
+            <text x="30" y="32" text-anchor="middle" font-size="8.5" fill="#e9d5ff">12B Align</text>
+          </g>
+        </g>
+
+        <!-- Total sum banner -->
+        <text x="14" y="98" font-size="9.5" fill="#a855f7">
+          Total Memory Footprint: <tspan font-weight="700" fill="#fff">8 + 16 + 16 + 4 + 2 + 6 + 12 = 64 Bytes</tspan> (Zero False Sharing across CPU Cores)
+        </text>
+      </g>
+
+      <!-- Bottom Specs -->
+      <g transform="translate(14, 202)">
+        <rect width="612" height="48" rx="4" fill="#180736" stroke="#9333ea" stroke-width="1"/>
+        <text x="12" y="20" font-size="10" font-weight="700" fill="#f5d0fe">Consumer Model:</text>
+        <text x="12" y="36" font-size="9.5" fill="#e9d5ff">
+          Userspace <tspan font-family="monospace" fill="#38bdf8">RingBufConsumer (AsyncFd)</tspan> polls via Epoll. Zero-allocation memory transmutation.
+        </text>
+      </g>
+    </g>
+
+    <!-- ==================== CARD 4: STATS ARRAY (BOTTOM-RIGHT) ==================== -->
+    <g transform="translate(680, 310)">
+      <rect width="365" height="265" rx="12" fill="url(#card-stats)" stroke="#818cf8" stroke-width="2" filter="url(#shadow)"/>
+      <text x="16" y="31" font-size="14" font-weight="800" fill="#c7d2fe">STATS ARRAY (GLOBAL COUNTERS)</text>
+
+      <rect x="235" y="14" width="115" height="22" rx="5" fill="#1e1b4b" stroke="#818cf8" stroke-width="1"/>
+      <text x="245" y="29" font-size="10" font-family="monospace" font-weight="700" fill="#a5b4fc">ATOMIC U64</text>
+
+      <text x="16" y="58" font-size="10.5" fill="#cbd5e1">
+        High-speed in-kernel counters updated via atomic operations per packet.
+      </text>
+
+      <!-- Stats Metrics Box -->
+      <g transform="translate(14, 75)">
+        <rect width="337" height="115" rx="6" fill="#181545" stroke="#6366f1" stroke-width="1.2"/>
+        
+        <g transform="translate(14, 18)">
+          <rect width="18" height="18" rx="4" fill="#047857"/>
+          <text x="40" y="14" font-size="10.5" font-weight="700" fill="#f8fafc">rx_packets</text>
+          <text x="160" y="14" font-size="9.5" font-family="monospace" fill="#34d399">u64 • Total Packets</text>
+        </g>
+        <g transform="translate(14, 42)">
+          <rect width="18" height="18" rx="4" fill="#0369a1"/>
+          <text x="40" y="14" font-size="10.5" font-weight="700" fill="#f8fafc">rx_bytes</text>
+          <text x="160" y="14" font-size="9.5" font-family="monospace" fill="#38bdf8">u64 • Total Ingress Bytes</text>
+        </g>
+        <g transform="translate(14, 66)">
+          <rect width="18" height="18" rx="4" fill="#991b1b"/>
+          <text x="40" y="14" font-size="10.5" font-weight="700" fill="#f8fafc">dropped_packets</text>
+          <text x="160" y="14" font-size="9.5" font-family="monospace" fill="#f87171">u64 • Blocked (XDP_DROP)</text>
+        </g>
+        <g transform="translate(14, 90)">
+          <rect width="18" height="18" rx="4" fill="#b45309"/>
+          <text x="40" y="14" font-size="10.5" font-weight="700" fill="#f8fafc">dropped_bytes</text>
+          <text x="160" y="14" font-size="9.5" font-family="monospace" fill="#fbbf24">u64 • Blocked Wire Bytes</text>
+        </g>
+      </g>
+
+      <!-- Bottom Polling Spec -->
+      <g transform="translate(14, 202)">
+        <rect width="337" height="48" rx="4" fill="#131038" stroke="#4f46e5" stroke-width="1"/>
+        <text x="10" y="20" font-size="10" font-weight="700" fill="#c7d2fe">Telemetry Readout:</text>
+        <text x="10" y="36" font-size="9.5" fill="#e0e7ff">
+          Userspace <tspan font-family="monospace" fill="#fbbf24">StatsReporter</tspan> reads index 0 every N seconds.
+        </text>
+      </g>
+    </g>
+  </g>
+</svg>

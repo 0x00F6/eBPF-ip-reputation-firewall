@@ -1,0 +1,341 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1150 740" width="100%" height="100%" style="background:#090d16; font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <!-- Filters -->
+    <filter id="shadow" x="-8%" y="-8%" width="116%" height="116%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+    <filter id="glow-cyan" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#38bdf8" flood-opacity="0.6"/>
+    </filter>
+    <filter id="glow-purple" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#a855f7" flood-opacity="0.6"/>
+    </filter>
+    <filter id="glow-orange" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#f97316" flood-opacity="0.6"/>
+    </filter>
+    <filter id="glow-red" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#ef4444" flood-opacity="0.7"/>
+    </filter>
+
+    <!-- Gradients -->
+    <linearGradient id="bg-host" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#020617"/>
+      <stop offset="100%" stop-color="#090d16"/>
+    </linearGradient>
+    <linearGradient id="bg-bridge" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b1b36"/>
+      <stop offset="100%" stop-color="#051024"/>
+    </linearGradient>
+
+    <!-- Markers -->
+    <marker id="arrow-cyan" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#ef4444"/>
+    </marker>
+    <marker id="arrow-amber" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#f59e0b"/>
+    </marker>
+    <marker id="arrow-orange" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#f97316"/>
+    </marker>
+    <marker id="arrow-purple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#c084fc"/>
+    </marker>
+
+    <!-- Background Pattern -->
+    <pattern id="dot-grid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#1e293b" opacity="0.6"/>
+    </pattern>
+
+    <!-- Icons -->
+    <g id="icon-docker">
+      <rect x="2" y="7" width="4" height="3" fill="#38bdf8"/>
+      <rect x="7" y="7" width="4" height="3" fill="#38bdf8"/>
+      <rect x="12" y="7" width="4" height="3" fill="#38bdf8"/>
+      <rect x="7" y="3" width="4" height="3" fill="#38bdf8"/>
+      <rect x="12" y="3" width="4" height="3" fill="#38bdf8"/>
+      <path d="M 1 11 c 1 4 5 7 11 7 c 6 0 9-3 10-5 c-1.5 0-3-1-3-2 c 0 0-2 0-3 1 c-3 0-6-1-8-1 c-3 0-6 0-7 0 z" fill="#0284c7"/>
+    </g>
+
+    <g id="icon-traffic">
+      <path d="M12 2 L16 8 L13 8 L13 16 L11 16 L11 8 L8 8 Z" fill="#818cf8"/>
+      <polygon points="12,16 15,22 13,20 12,22 11,20 9,22" fill="#f43f5e"/>
+    </g>
+
+    <g id="icon-firewall">
+      <path d="M12 2 L20 5 v6 c0 5-3.5 8-8 10 c-4.5-2-8-5-8-10 V5 z" fill="#7e22ce" opacity="0.4"/>
+      <path d="M12 2 L20 5 v6 c0 5-3.5 8-8 10 c-4.5-2-8-5-8-10 V5 z" fill="none" stroke="#c084fc" stroke-width="1.8"/>
+      <polygon points="13,6 8,13 12,13 11,18 16,11 12,11" fill="#facc15"/>
+    </g>
+
+    <g id="icon-prometheus">
+      <rect x="2" y="2" width="20" height="20" rx="4" fill="#ea580c" opacity="0.2"/>
+      <path d="M12 4 c0 4-4 6-4 10 a4 4 0 0 0 8 0 c0-3-2-5-2-7 z" fill="#f97316"/>
+      <circle cx="12" cy="15" r="2" fill="#fef08a"/>
+    </g>
+
+    <g id="icon-grafana">
+      <rect x="2" y="2" width="20" height="20" rx="4" fill="#f97316" opacity="0.2"/>
+      <path d="M12 4 A 8 8 0 1 0 20 12 A 4 4 0 0 0 16 8 A 2 2 0 0 0 14 6" fill="none" stroke="#fb923c" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="12" cy="12" r="2.5" fill="#fed7aa"/>
+    </g>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="100%" height="100%" fill="#090d16"/>
+  <rect width="100%" height="100%" fill="url(#dot-grid)"/>
+
+  <!-- ==================== HEADER BAR ==================== -->
+  <g transform="translate(40, 20)">
+    <text x="0" y="24" font-size="20" font-weight="800" fill="#f8fafc" letter-spacing="0.5">
+      DOCKER COMPOSE DEPLOYMENT
+      <tspan font-size="16" font-weight="400" fill="#94a3b8"> — Network Topology &amp; Services</tspan>
+    </text>
+    <text x="0" y="44" font-size="12" font-weight="500" fill="#64748b">
+      Isolated Virtual Testbed on Dedicated Docker Bridge Subnet (firewall-net: 172.28.0.0/16)
+    </text>
+
+    <!-- Top Badges -->
+    <g transform="translate(710, 5)">
+      <rect width="185" height="26" rx="6" fill="#082f49" stroke="#0ea5e9" stroke-width="1"/>
+      <text x="12" y="17" font-size="11" font-weight="700" fill="#7dd3fc">🐳 firewall-net (172.28/16)</text>
+
+      <rect x="195" width="185" height="26" rx="6" fill="#1e1b4b" stroke="#818cf8" stroke-width="1"/>
+      <text x="207" y="17" font-size="11" font-weight="700" fill="#c7d2fe">⚡ 4 Isolated Containers</text>
+    </g>
+  </g>
+
+  <!-- ==================== HOST BOUNDARY CONTAINER ==================== -->
+  <g id="host-container" transform="translate(40, 80)">
+    <!-- Linux Host System Outer Box -->
+    <rect width="1070" height="625" rx="14" fill="url(#bg-host)" stroke="#334155" stroke-width="2" filter="url(#shadow)"/>
+    
+    <!-- Host Header Badge -->
+    <g transform="translate(20, 14)">
+      <rect width="210" height="28" rx="6" fill="#1e293b" stroke="#64748b" stroke-width="1.2"/>
+      <text x="14" y="19" font-size="12.5" font-weight="700" fill="#f8fafc">🖥️ Linux Host System</text>
+    </g>
+
+    <!-- ==================== DOCKER BRIDGE CONTAINER ==================== -->
+    <g id="docker-bridge" transform="translate(25, 55)">
+      <!-- Bridge Inner Box -->
+      <rect width="1020" height="420" rx="12" fill="url(#bg-bridge)" stroke="#0ea5e9" stroke-width="1.8" stroke-dasharray="6 3" filter="url(#shadow)"/>
+      
+      <!-- Bridge Header -->
+      <g transform="translate(18, 14)">
+        <rect width="360" height="26" rx="5" fill="#0369a1" fill-opacity="0.3" stroke="#38bdf8" stroke-width="1"/>
+        <use href="#icon-docker" x="8" y="3" width="24" height="20"/>
+        <text x="36" y="18" font-size="12" font-weight="700" fill="#7dd3fc">
+          Docker Bridge: firewall-net (172.28.0.0/16)
+        </text>
+      </g>
+
+      <!-- ==================== CONTAINER 1: TRAFFIC GENERATOR ==================== -->
+      <g transform="translate(20, 60)">
+        <rect width="215" height="325" rx="10" fill="#151336" stroke="#818cf8" stroke-width="1.8" filter="url(#shadow)"/>
+        <use href="#icon-traffic" x="12" y="12" width="24" height="24"/>
+        <text x="40" y="28" font-size="13" font-weight="700" fill="#c7d2fe">traffic-generator</text>
+
+        <!-- Subnet IP pill -->
+        <rect x="12" y="46" width="115" height="20" rx="4" fill="#312e81"/>
+        <text x="20" y="60" font-size="10.5" font-family="monospace" font-weight="700" fill="#a5b4fc">📍 172.28.0.10</text>
+
+        <!-- Role badge -->
+        <g transform="translate(12, 78)">
+          <rect width="190" height="36" rx="4" fill="#1e1b4b" stroke="#6366f1" stroke-width="1"/>
+          <text x="8" y="15" font-size="9.5" font-weight="700" fill="#e0e7ff">Synthetic Ingress Attacks</text>
+          <text x="8" y="28" font-size="8.5" fill="#c7d2fe">High-Throughput Packet Injection</text>
+        </g>
+
+        <!-- Tech specs -->
+        <g transform="translate(12, 126)">
+          <text x="4" y="16" font-size="10" font-weight="700" fill="#f8fafc">Capabilities &amp; Engine:</text>
+          <text x="4" y="34" font-size="9.5" font-family="monospace" fill="#38bdf8">• NET_ADMIN, NET_RAW</text>
+          <text x="4" y="52" font-size="9.5" font-family="monospace" fill="#38bdf8">• Raw AF_PACKET Sockets</text>
+          <text x="4" y="70" font-size="9.5" font-family="monospace" fill="#38bdf8">• Multi-Threaded Workers</text>
+        </g>
+
+        <!-- Protocols simulated -->
+        <g transform="translate(12, 215)">
+          <rect width="190" height="95" rx="5" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+          <text x="8" y="16" font-size="9.5" font-weight="700" fill="#f8fafc">Simulated Attack Vectors:</text>
+          <text x="8" y="34" font-size="9" fill="#fda4af">💣 TCP SYN Flood (Port 80/443)</text>
+          <text x="8" y="50" font-size="9" fill="#fda4af">💣 UDP Amplification Blast</text>
+          <text x="8" y="66" font-size="9" fill="#fda4af">💣 ICMP / ICMPv6 Echo Flood</text>
+          <text x="8" y="82" font-size="9" fill="#a7f3d0">✅ Legitimate Allow-list IPs</text>
+        </g>
+      </g>
+
+      <!-- ==================== FLOW ARROW 1: ATTACK TRAFFIC ==================== -->
+      <g transform="translate(235, 185)">
+        <line x1="0" y1="0" x2="40" y2="0" stroke="#ef4444" stroke-width="3" marker-end="url(#arrow-red)"/>
+        <rect x="-10" y="-35" width="60" height="26" rx="4" fill="#450a0a" stroke="#ef4444" stroke-width="1" filter="url(#glow-red)"/>
+        <text x="20" y="-22" text-anchor="middle" font-size="9" font-weight="800" fill="#fca5a5">WIRE</text>
+        <text x="20" y="-12" text-anchor="middle" font-size="8" fill="#fecaca">PACKETS</text>
+      </g>
+
+      <!-- ==================== CONTAINER 2: EBPF FIREWALL ==================== -->
+      <g transform="translate(280, 60)">
+        <rect width="230" height="325" rx="10" fill="#241038" stroke="#c084fc" stroke-width="2" filter="url(#glow-purple)"/>
+        <use href="#icon-firewall" x="12" y="12" width="24" height="24"/>
+        <text x="42" y="28" font-size="13" font-weight="800" fill="#f5d0fe">ebpf-firewall</text>
+
+        <!-- Subnet IP pill -->
+        <rect x="12" y="46" width="110" height="20" rx="4" fill="#581c87"/>
+        <text x="20" y="60" font-size="10.5" font-family="monospace" font-weight="700" fill="#e9d5ff">📍 172.28.0.2</text>
+
+        <!-- Role badge -->
+        <g transform="translate(12, 78)">
+          <rect width="205" height="36" rx="4" fill="#3b0764" stroke="#a855f7" stroke-width="1"/>
+          <text x="8" y="15" font-size="9.5" font-weight="700" fill="#fae8ff">XDP Driver Filtering &amp; Exporter</text>
+          <text x="8" y="28" font-size="8.5" fill="#d8b4fe">High-Speed Line-Rate Security Daemon</text>
+        </g>
+
+        <!-- Engine Specs -->
+        <g transform="translate(12, 126)">
+          <text x="4" y="16" font-size="10" font-weight="700" fill="#f8fafc">Architecture &amp; Features:</text>
+          <text x="4" y="34" font-size="9.5" fill="#e9d5ff">⚡ Ingress XDP Hook (Aya)</text>
+          <text x="4" y="52" font-size="9.5" fill="#e9d5ff">🎯 O(1) Exact &amp; LPM Trie</text>
+          <text x="4" y="70" font-size="9.5" fill="#e9d5ff">🌐 FireHOL Git Sync + Cron</text>
+          <text x="4" y="88" font-size="9.5" fill="#e9d5ff">🗄️ RocksDB + rkyv Cache</text>
+          <text x="4" y="106" font-size="9.5" fill="#e9d5ff">📡 64B Lockless RingBuffer</text>
+        </g>
+
+        <!-- Exposed port pill -->
+        <g transform="translate(12, 255)">
+          <rect width="205" height="55" rx="5" fill="#0f172a" stroke="#0284c7" stroke-width="1.2"/>
+          <text x="10" y="18" font-size="10" font-weight="700" fill="#38bdf8">Exposed Service:</text>
+          <text x="10" y="34" font-size="10" font-family="monospace" fill="#f8fafc">HTTP 0.0.0.0:9100/metrics</text>
+          <text x="10" y="47" font-size="8.5" fill="#94a3b8">Host Port Binding 9100:9100</text>
+        </g>
+      </g>
+
+      <!-- ==================== CONTAINER 3: PROMETHEUS ==================== -->
+      <g transform="translate(545, 60)">
+        <rect width="220" height="325" rx="10" fill="#2d1303" stroke="#f97316" stroke-width="1.8" filter="url(#shadow)"/>
+        <use href="#icon-prometheus" x="12" y="12" width="24" height="24"/>
+        <text x="42" y="28" font-size="13" font-weight="700" fill="#fed7aa">prometheus</text>
+
+        <!-- Subnet IP pill -->
+        <rect x="12" y="46" width="110" height="20" rx="4" fill="#7c2d12"/>
+        <text x="20" y="60" font-size="10.5" font-family="monospace" font-weight="700" fill="#ffedd5">📍 172.28.0.3</text>
+
+        <!-- Role badge -->
+        <g transform="translate(12, 78)">
+          <rect width="195" height="36" rx="4" fill="#431407" stroke="#ea580c" stroke-width="1"/>
+          <text x="8" y="15" font-size="9.5" font-weight="700" fill="#ffedd5">Time-Series DB (TSDB)</text>
+          <text x="8" y="28" font-size="8.5" fill="#fed7aa">Continuous Scraper &amp; PromQL API</text>
+        </g>
+
+        <!-- Specs -->
+        <g transform="translate(12, 126)">
+          <text x="4" y="16" font-size="10" font-weight="700" fill="#f8fafc">Scrape Configuration:</text>
+          <text x="4" y="34" font-size="9.5" fill="#fed7aa">📥 Scrape Interval: <tspan font-weight="700" fill="#fff">2s</tspan></text>
+          <text x="4" y="52" font-size="9.5" fill="#fed7aa">🎯 Target: <tspan font-family="monospace" fill="#38bdf8">firewall:9100</tspan></text>
+          <text x="4" y="70" font-size="9.5" fill="#fed7aa">💾 TSDB Retention: 15d</text>
+          <text x="4" y="88" font-size="9.5" fill="#fed7aa">⚡ Top 100 IP Cardinality</text>
+        </g>
+
+        <!-- Exposed port pill -->
+        <g transform="translate(12, 255)">
+          <rect width="195" height="55" rx="5" fill="#0f172a" stroke="#ea580c" stroke-width="1.2"/>
+          <text x="10" y="18" font-size="10" font-weight="700" fill="#fb923c">Prometheus UI &amp; API:</text>
+          <text x="10" y="34" font-size="10" font-family="monospace" fill="#f8fafc">HTTP 0.0.0.0:9090</text>
+          <text x="10" y="47" font-size="8.5" fill="#94a3b8">Host Port Binding 9090:9090</text>
+        </g>
+      </g>
+
+      <!-- ==================== FLOW ARROW 2: SCRAPE ==================== -->
+      <g transform="translate(545, 175)">
+        <line x1="0" y1="0" x2="-30" y2="0" stroke="#f59e0b" stroke-width="2.5" marker-end="url(#arrow-amber)"/>
+        <rect x="-32" y="-30" width="34" height="24" rx="4" fill="#451a03" stroke="#f59e0b" stroke-width="1"/>
+        <text x="-15" y="-18" text-anchor="middle" font-size="8" font-weight="700" fill="#fde68a">SCRAPE</text>
+        <text x="-15" y="-9" text-anchor="middle" font-size="7.5" fill="#fef3c7">(2s)</text>
+      </g>
+
+      <!-- ==================== CONTAINER 4: GRAFANA ==================== -->
+      <g transform="translate(795, 60)">
+        <rect width="205" height="325" rx="10" fill="#201103" stroke="#f97316" stroke-width="1.8" filter="url(#shadow)"/>
+        <use href="#icon-grafana" x="12" y="12" width="24" height="24"/>
+        <text x="42" y="28" font-size="13" font-weight="700" fill="#fed7aa">grafana</text>
+
+        <!-- Subnet IP pill -->
+        <rect x="12" y="46" width="110" height="20" rx="4" fill="#7c2d12"/>
+        <text x="20" y="60" font-size="10.5" font-family="monospace" font-weight="700" fill="#ffedd5">📍 172.28.0.4</text>
+
+        <!-- Role badge -->
+        <g transform="translate(12, 78)">
+          <rect width="180" height="36" rx="4" fill="#431407" stroke="#ea580c" stroke-width="1"/>
+          <text x="8" y="15" font-size="9.5" font-weight="700" fill="#ffedd5">Analytics Dashboard UI</text>
+          <text x="8" y="28" font-size="8.5" fill="#fed7aa">Grafana v11 Visualization</text>
+        </g>
+
+        <!-- Specs -->
+        <g transform="translate(12, 126)">
+          <text x="4" y="16" font-size="10" font-weight="700" fill="#f8fafc">Dashboard Features:</text>
+          <text x="4" y="34" font-size="9.5" fill="#fed7aa">📊 69 Provisioned Panels</text>
+          <text x="4" y="52" font-size="9.5" fill="#fed7aa">🏆 Top 100 Leaderboard</text>
+          <text x="4" y="70" font-size="9.5" fill="#fed7aa">🌐 FireHOL Categories</text>
+          <text x="4" y="88" font-size="9.5" fill="#fed7aa">🗺️ eBPF Map Sync &amp; Latency</text>
+        </g>
+
+        <!-- Exposed port pill -->
+        <g transform="translate(12, 255)">
+          <rect width="180" height="55" rx="5" fill="#0f172a" stroke="#f97316" stroke-width="1.2"/>
+          <text x="10" y="18" font-size="10" font-weight="700" fill="#fb923c">Grafana Web UI:</text>
+          <text x="10" y="34" font-size="10" font-family="monospace" fill="#f8fafc">HTTP 0.0.0.0:3000</text>
+          <text x="10" y="47" font-size="8.5" fill="#94a3b8">Host Port Binding 3000:3000</text>
+        </g>
+      </g>
+
+      <!-- ==================== FLOW ARROW 3: PROMQL ==================== -->
+      <g transform="translate(795, 175)">
+        <line x1="0" y1="0" x2="-25" y2="0" stroke="#f97316" stroke-width="2.5" marker-end="url(#arrow-orange)"/>
+        <rect x="-26" y="-30" width="30" height="24" rx="4" fill="#431407" stroke="#f97316" stroke-width="1"/>
+        <text x="-11" y="-18" text-anchor="middle" font-size="7.5" font-weight="700" fill="#fed7aa">PromQL</text>
+        <text x="-11" y="-9" text-anchor="middle" font-size="7" fill="#ffedd5">API</text>
+      </g>
+    </g>
+
+    <!-- ==================== HOST PORTS BAR (BOTTOM) ==================== -->
+    <g transform="translate(25, 495)">
+      <!-- Port 9100 (Firewall Metrics) -->
+      <g transform="translate(270, 0)">
+        <rect width="215" height="50" rx="8" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" stroke-dasharray="5 3"/>
+        <text x="14" y="20" font-size="11" font-weight="700" fill="#38bdf8">🔌 Host Port 9100</text>
+        <text x="14" y="36" font-size="9" font-family="monospace" fill="#94a3b8">curl http://localhost:9100/metrics</text>
+      </g>
+      <!-- Line from Firewall to Port 9100 -->
+      <path d="M 395 385 L 395 490" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4 2" marker-end="url(#arrow-cyan)"/>
+
+      <!-- Port 9090 (Prometheus UI) -->
+      <g transform="translate(535, 0)">
+        <rect width="215" height="50" rx="8" fill="#0f172a" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5 3"/>
+        <text x="14" y="20" font-size="11" font-weight="700" fill="#f59e0b">🔌 Host Port 9090</text>
+        <text x="14" y="36" font-size="9" font-family="monospace" fill="#94a3b8">http://localhost:9090 (Prometheus)</text>
+      </g>
+      <!-- Line from Prometheus to Port 9090 -->
+      <path d="M 645 385 L 645 490" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4 2" marker-end="url(#arrow-amber)"/>
+
+      <!-- Port 3000 (Grafana Dashboard) -->
+      <g transform="translate(785, 0)">
+        <rect width="215" height="50" rx="8" fill="#0f172a" stroke="#f97316" stroke-width="2" stroke-dasharray="5 3" filter="url(#glow-orange)"/>
+        <text x="14" y="20" font-size="11" font-weight="800" fill="#fb923c">🔌 Host Port 3000</text>
+        <text x="14" y="36" font-size="9.5" font-family="monospace" font-weight="600" fill="#f8fafc">http://localhost:3000 (Grafana)</text>
+      </g>
+      <!-- Line from Grafana to Port 3000 -->
+      <path d="M 895 385 L 895 490" fill="none" stroke="#f97316" stroke-width="2" stroke-dasharray="4 2" marker-end="url(#arrow-orange)"/>
+
+      <!-- External User / Browser Access -->
+      <g transform="translate(785, 65)">
+        <rect width="215" height="42" rx="6" fill="#1e293b" stroke="#10b981" stroke-width="1.5"/>
+        <text x="12" y="18" font-size="11" font-weight="700" fill="#a7f3d0">🌐 SecOps / Admin Browser</text>
+        <text x="12" y="32" font-size="9.5" fill="#6ee7b7">Live Real-Time Monitoring</text>
+      </g>
+      <!-- Line from User to Port 3000 -->
+      <line x1="895" y1="65" x2="895" y2="54" stroke="#10b981" stroke-width="2" marker-end="url(#arrow-green)"/>
+    </g>
+  </g>
+</svg>

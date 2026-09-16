@@ -1,0 +1,513 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1320" viewBox="0 0 1800 1320" role="img" aria-labelledby="title desc">
+<title id="title">Rust eBPF XDP IP Reputation Firewall Architecture</title>
+<desc id="desc">Dark-mode architecture diagram of a Rust control plane feeding eBPF maps used by an XDP firewall fast path, with FireHOL threat intelligence, static blocklists, RocksDB enrichment, ring-buffer events, and Prometheus telemetry.</desc>
+
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#06101d"/>
+    <stop offset="0.58" stop-color="#0a1220"/>
+    <stop offset="1" stop-color="#140a26"/>
+  </linearGradient>
+  <linearGradient id="userBg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#0b1a2e"/>
+    <stop offset="1" stop-color="#091423"/>
+  </linearGradient>
+  <linearGradient id="kernelBg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#211038"/>
+    <stop offset="1" stop-color="#130b24"/>
+  </linearGradient>
+  <linearGradient id="xdpBg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#4c1d95"/>
+    <stop offset="1" stop-color="#2e1065"/>
+  </linearGradient>
+  <linearGradient id="mapBg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#083a31"/>
+    <stop offset="1" stop-color="#052720"/>
+  </linearGradient>
+
+  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+    <feDropShadow dx="0" dy="7" stdDeviation="9" flood-color="#000" flood-opacity="0.28"/>
+  </filter>
+
+  <marker id="aNet" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto">
+    <path d="M0 0L11 5.5L0 11Z" fill="#38bdf8"/>
+  </marker>
+  <marker id="aSync" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto">
+    <path d="M0 0L11 5.5L0 11Z" fill="#10b981"/>
+  </marker>
+  <marker id="aEvt" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto">
+    <path d="M0 0L11 5.5L0 11Z" fill="#f59e0b"/>
+  </marker>
+  <marker id="aThreat" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto">
+    <path d="M0 0L11 5.5L0 11Z" fill="#fb7185"/>
+  </marker>
+  <marker id="aLookup" markerWidth="11" markerHeight="11" refX="9" refY="5.5" orient="auto">
+    <path d="M0 0L11 5.5L0 11Z" fill="#c084fc"/>
+  </marker>
+
+  <style>
+    text { font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Arial, sans-serif; }
+    .h1 { fill:#f8fafc; font-size:30px; font-weight:800; }
+    .lead { fill:#9fb0c5; font-size:14px; font-weight:500; }
+    .sec { fill:#f8fafc; font-size:19px; font-weight:800; }
+    .sub { fill:#a7b9d0; font-size:12.5px; font-weight:500; }
+    .nt { fill:#f8fafc; font-size:14px; font-weight:760; }
+    .ns { fill:#c3cfdd; font-size:11.8px; font-weight:520; }
+    .micro { fill:#cbd5e1; font-size:10.8px; font-weight:650; }
+    .pill { fill:#e2e8f0; font-size:10.5px; font-weight:800; letter-spacing:.25px; }
+    .panel { rx:24; ry:24; filter:url(#shadow); }
+    .subpanel { rx:18; ry:18; }
+    .node { rx:14; ry:14; }
+    .flowNet { fill:none; stroke:#38bdf8; stroke-width:3; marker-end:url(#aNet); }
+    .flowSync { fill:none; stroke:#10b981; stroke-width:3; marker-end:url(#aSync); }
+    .flowEvt { fill:none; stroke:#f59e0b; stroke-width:3; marker-end:url(#aEvt); }
+    .flowThreat { fill:none; stroke:#fb7185; stroke-width:2.3; stroke-dasharray:7 6; marker-end:url(#aThreat); }
+    .flowLookup { fill:none; stroke:#c084fc; stroke-width:3; marker-end:url(#aLookup); }
+    .flowCtl { fill:none; stroke:#64748b; stroke-width:2; stroke-dasharray:5 6; marker-end:url(#aNet); }
+  </style>
+
+  <!-- Reusable vector pictograms: embedded, no external assets -->
+  <symbol id="icon-rust-crab" viewBox="0 0 24 24">
+    <path d="M7 10.5C7.8 8.8 9.5 8 12 8s4.2.8 5 2.5c.7 1.4.4 3.3-.8 4.4-1.3 1.2-3.2 1.6-5.7 1.6s-4.4-.4-5.7-1.6c-1.2-1.1-1.5-3-.8-4.4Z" fill="currentColor"/>
+    <circle cx="10" cy="8" r="1.2" fill="currentColor"/><circle cx="14" cy="8" r="1.2" fill="currentColor"/>
+    <path d="M7 11 3.8 9.3 2.8 6.8M17 11l3.2-1.7 1-2.5M6.5 13.5 3 15.5M17.5 13.5 21 15.5M8 14.5 6 18M16 14.5l2 3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+    <path d="M2.5 6.7c.3-1.5 1.4-2.2 2.8-1.8-.1 1.5-1 2.4-2.8 1.8Zm19 0c-.3-1.5-1.4-2.2-2.8-1.8.1 1.5 1 2.4 2.8 1.8Z" fill="currentColor"/>
+  </symbol>
+
+  <symbol id="icon-linux" viewBox="0 0 24 24">
+    <ellipse cx="12" cy="13" rx="6" ry="8" fill="currentColor" opacity=".95"/>
+    <ellipse cx="12" cy="14.5" rx="3.7" ry="5.2" fill="#0f172a"/>
+    <circle cx="10" cy="8" r="1" fill="#0f172a"/><circle cx="14" cy="8" r="1" fill="#0f172a"/>
+    <path d="M10.5 10.2 12 9.3l1.5.9-1.5 1Z" fill="#f59e0b"/>
+    <path d="M7.5 20 5 22M16.5 20 19 22" stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="icon-config" viewBox="0 0 24 24">
+    <path d="M4 6h10M18 6h2M4 12h3M11 12h9M4 18h8M16 18h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="16" cy="6" r="2" fill="none" stroke="currentColor" stroke-width="2"/>
+    <circle cx="9" cy="12" r="2" fill="none" stroke="currentColor" stroke-width="2"/>
+    <circle cx="14" cy="18" r="2" fill="none" stroke="currentColor" stroke-width="2"/>
+  </symbol>
+
+  <symbol id="icon-shield" viewBox="0 0 24 24">
+    <path d="M12 3 20 6v5c0 5-3.4 8.2-8 10-4.6-1.8-8-5-8-10V6l8-3Z" fill="none" stroke="currentColor" stroke-width="2"/>
+    <path d="m8.5 12 2.2 2.2 4.8-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <symbol id="icon-flame" viewBox="0 0 24 24">
+    <path d="M12.7 2.5c1.2 4-2.7 5.4-.7 8.2 1.1-1 1.8-2.2 2.2-3.5 2.7 2.2 4.3 4.7 4.3 7.4A6.5 6.5 0 1 1 5.5 14c0-2.5 1.3-4.9 4-7.3-.2 2 .5 3.3 1.6 4.2.5-2.7-1.2-4.6 1.6-8.4Z" fill="currentColor"/>
+  </symbol>
+
+  <symbol id="icon-clock" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/>
+    <path d="M12 7v5l3.5 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="icon-git" viewBox="0 0 24 24">
+    <circle cx="6" cy="5" r="2" fill="currentColor"/><circle cx="18" cy="7" r="2" fill="currentColor"/><circle cx="6" cy="19" r="2" fill="currentColor"/>
+    <path d="M6 7v10M8 10c5 0 4-3 8-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="icon-github" viewBox="0 0 24 24">
+    <path d="M5.2 8.2 7 4.7l3 1.7a10 10 0 0 1 4 0l3-1.7 1.8 3.5c1 1.2 1.5 2.8 1.4 4.5 0 4.5-3.2 7.3-8.2 7.3s-8.2-2.8-8.2-7.3c-.1-1.7.4-3.3 1.4-4.5Z" fill="currentColor"/>
+    <circle cx="9.3" cy="12" r="1" fill="#111827"/><circle cx="14.7" cy="12" r="1" fill="#111827"/>
+    <path d="M9.5 15c1.5 1 3.5 1 5 0" fill="none" stroke="#111827" stroke-width="1.2" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="icon-parser" viewBox="0 0 24 24">
+    <path d="M5 5h9M5 10h6M5 15h8M5 20h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    <path d="m15 9 4 3-4 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <symbol id="icon-db" viewBox="0 0 24 24">
+    <ellipse cx="12" cy="5.5" rx="7" ry="3" fill="none" stroke="currentColor" stroke-width="2"/>
+    <path d="M5 5.5v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6M5 11.5v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6" fill="none" stroke="currentColor" stroke-width="2"/>
+  </symbol>
+
+  <symbol id="icon-file" viewBox="0 0 24 24">
+    <path d="M6 3h8l4 4v14H6Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M14 3v5h5M9 12h6M9 16h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="icon-eye" viewBox="0 0 24 24">
+    <path d="M3 12s3.2-5.5 9-5.5S21 12 21 12s-3.2 5.5-9 5.5S3 12 3 12Z" fill="none" stroke="currentColor" stroke-width="2"/>
+    <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+  </symbol>
+
+  <symbol id="icon-load" viewBox="0 0 24 24">
+    <path d="M6 3h8l4 4v14H6Z" fill="none" stroke="currentColor" stroke-width="2"/>
+    <path d="M14 3v5h5M9 13h6M12 10v6m0 0-2-2m2 2 2-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+
+  <symbol id="icon-map" viewBox="0 0 24 24">
+    <path d="m4 6 5-2 6 2 5-2v14l-5 2-6-2-5 2Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M9 4v14M15 6v14" fill="none" stroke="currentColor" stroke-width="2"/>
+  </symbol>
+
+  <symbol id="icon-observe" viewBox="0 0 24 24">
+    <path d="M4 18V9M10 18V5M16 18v-6M22 18v-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    <path d="M3 20h20" fill="none" stroke="currentColor" stroke-width="2"/>
+  </symbol>
+
+  <symbol id="icon-ringbuf" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" stroke-width="2"/>
+    <path d="M12 5a7 7 0 0 1 6.3 4" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+    <path d="m18.2 6.8.6 3.2-3.2-.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+  </symbol>
+
+  <symbol id="icon-tag" viewBox="0 0 24 24">
+    <path d="M4 4h7l9 9-7 7-9-9Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+    <circle cx="8" cy="8" r="1.4" fill="currentColor"/>
+  </symbol>
+
+  <symbol id="icon-log" viewBox="0 0 24 24">
+    <path d="M6 3h12v18H6Z" fill="none" stroke="currentColor" stroke-width="2"/>
+    <path d="M9 8h6M9 12h6M9 16h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="icon-trophy" viewBox="0 0 24 24">
+    <path d="M8 4h8v4c0 3-1.6 5-4 5s-4-2-4-5Z" fill="none" stroke="currentColor" stroke-width="2"/>
+    <path d="M8 6H4v2c0 2 1.3 3.5 4 4M16 6h4v2c0 2-1.3 3.5-4 4M12 13v4M8 21h8M9 17h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="icon-prometheus" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/>
+    <path d="M12.7 4.2c.8 2.8-1.7 4-.4 5.9.8-.7 1.3-1.5 1.6-2.4 1.8 1.5 2.9 3.2 2.9 5.1A4.8 4.8 0 1 1 7.2 12c0-1.7.9-3.4 2.7-5-.1 1.4.3 2.3 1.1 2.9.3-1.8-.8-3.1 1.7-5.7Z" fill="currentColor"/>
+    <path d="M8 17h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="icon-lightning" viewBox="0 0 24 24">
+    <path d="m13 2-7 11h5l-1 9 8-12h-5Z" fill="currentColor"/>
+  </symbol>
+
+  <symbol id="icon-nic" viewBox="0 0 24 24">
+    <rect x="4" y="5" width="16" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+    <path d="M8 9v4M11 9v4M14 9v4M17 9v4M7 16h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="icon-ebpf" viewBox="0 0 24 24">
+    <path d="m12 3 7 4v10l-7 4-7-4V7Z" fill="none" stroke="currentColor" stroke-width="2"/>
+    <path d="m13 6-4 6h3l-1 6 5-7h-3Z" fill="currentColor"/>
+  </symbol>
+
+  <symbol id="icon-target" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+    <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/>
+    <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+  </symbol>
+
+  <symbol id="icon-lpm" viewBox="0 0 24 24">
+    <circle cx="12" cy="5" r="2" fill="currentColor"/>
+    <circle cx="6" cy="12" r="2" fill="currentColor"/>
+    <circle cx="18" cy="12" r="2" fill="currentColor"/>
+    <circle cx="4" cy="19" r="2" fill="currentColor"/>
+    <circle cx="9" cy="19" r="2" fill="currentColor"/>
+    <circle cx="15" cy="19" r="2" fill="currentColor"/>
+    <circle cx="20" cy="19" r="2" fill="currentColor"/>
+    <path d="M12 7v2M12 9 6 10M12 9l6 1M6 14l-2 3M6 14l3 3M18 14l-3 3M18 14l2 3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="icon-stats" viewBox="0 0 24 24">
+    <path d="M5 19V11M10 19V6M15 19v-9M20 19V4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+    <path d="M3 20h19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  </symbol>
+
+</defs>
+
+<rect width="1800" height="1320" fill="url(#bg)"/>
+
+<!-- Header -->
+<text x="64" y="58" class="h1">Rust eBPF / XDP IP Reputation Firewall</text>
+<text x="64" y="86" class="lead">Rust control plane • FireHOL + static blocklists • atomic eBPF map updates • XDP fast path • enriched security events • Prometheus metrics</text>
+
+<!-- Main zones -->
+<rect x="48" y="112" width="1112" height="1090" fill="url(#userBg)" stroke="#38bdf8" stroke-width="2" class="panel"/>
+<rect x="1185" y="112" width="567" height="1090" fill="url(#kernelBg)" stroke="#a855f7" stroke-width="2" class="panel"/>
+
+<!-- Zone headers -->
+<rect x="70" y="136" width="1068" height="58" rx="15" fill="#0e2741" stroke="#38bdf8" stroke-width="1.1"/>
+<circle cx="99" cy="165" r="16" fill="#102e4b" stroke="#38bdf8"/>
+<use href="#icon-rust-crab" x="88" y="154" width="22" height="22" color="#7dd3fc"/>
+<text x="125" y="161" class="sec">User Space — Rust Control Plane</text>
+<text x="125" y="182" class="sub">Tokio daemon orchestrating configuration, threat feeds, map synchronization, event handling and observability</text>
+
+<rect x="1208" y="136" width="521" height="58" rx="15" fill="#2b1447" stroke="#c084fc" stroke-width="1.1"/>
+<circle cx="1237" cy="165" r="16" fill="#3d1c64" stroke="#c084fc"/>
+<use href="#icon-linux" x="1226" y="151" width="22" height="26" color="#e9d5ff"/>
+<text x="1263" y="161" class="sec">Kernel Space — eBPF / XDP</text>
+<text x="1263" y="182" class="sub">Per-packet fast path: in-kernel lookups, drop events and low-overhead counters</text>
+
+<!-- USER: Top orchestration -->
+<rect x="78" y="222" width="255" height="92" fill="#111c2d" stroke="#64748b" stroke-width="1.2" class="node"/>
+<circle cx="105" cy="250" r="15" fill="#172338" stroke="#64748b"/>
+<use href="#icon-config" x="96" y="241" width="18" height="18" color="#cbd5e1"/>
+<text x="128" y="250" class="nt">CLI &amp; Environment</text>
+<text x="98" y="277" class="ns">Runtime flags, schedules, paths</text>
+<text x="98" y="297" class="ns">and feature configuration</text>
+
+<rect x="365" y="222" width="335" height="92" fill="#101f34" stroke="#38bdf8" stroke-width="1.5" class="node"/>
+<circle cx="393" cy="250" r="15" fill="#12324f" stroke="#38bdf8"/>
+<use href="#icon-shield" x="384" y="241" width="18" height="18" color="#7dd3fc"/>
+<text x="417" y="250" class="nt">Firewall Daemon</text>
+<text x="388" y="277" class="ns">Tokio async coordinator for all control-plane tasks</text>
+<text x="388" y="297" class="ns">Loads sources, updates maps and exports telemetry</text>
+
+<path d="M333 268H365" class="flowCtl"/>
+
+<!-- USER: FireHOL -->
+<rect x="78" y="355" width="625" height="304" fill="#0c1929" stroke="#0ea5e9" stroke-width="1.5" class="subpanel"/>
+<circle cx="107" cy="384" r="15" fill="#2a1720" stroke="#fb7185"/>
+<use href="#icon-flame" x="97" y="373" width="20" height="20" color="#fb7185"/>
+<text x="131" y="380" class="sec">FireHOL Threat Intelligence</text>
+<text x="131" y="402" class="sub">Scheduled fetch, parallel parsing and local zero-copy metadata cache</text>
+
+<rect x="100" y="439" width="165" height="70" fill="#121f31" stroke="#64748b" stroke-width="1.1" class="node"/>
+<circle cx="124" cy="463" r="12" fill="#172338" stroke="#64748b"/>
+<use href="#icon-clock" x="116" y="455" width="16" height="16" color="#cbd5e1"/>
+<text x="145" y="462" class="nt">Scheduler</text>
+<text x="120" y="487" class="ns">Cron-based refresh</text>
+
+<rect x="292" y="439" width="195" height="70" fill="#111f32" stroke="#38bdf8" stroke-width="1.1" class="node"/>
+<circle cx="316" cy="463" r="12" fill="#12324f" stroke="#38bdf8"/>
+<use href="#icon-git" x="308" y="455" width="16" height="16" color="#7dd3fc"/>
+<text x="337" y="462" class="nt">FireHOL Manager</text>
+<text x="312" y="487" class="ns">git2 • shallow fetch</text>
+
+<rect x="514" y="439" width="165" height="70" fill="#211721" stroke="#fb7185" stroke-width="1.1" class="node"/>
+<circle cx="538" cy="463" r="12" fill="#361923" stroke="#fb7185"/>
+<use href="#icon-github" x="530" y="454" width="17" height="17" color="#fecdd3"/>
+<text x="559" y="462" class="nt">Git Remote</text>
+<text x="534" y="487" class="ns">blocklist-ipsets</text>
+
+<rect x="146" y="552" width="205" height="82" fill="#121f31" stroke="#64748b" stroke-width="1.1" class="node"/>
+<circle cx="170" cy="578" r="12" fill="#172338" stroke="#64748b"/>
+<use href="#icon-parser" x="162" y="570" width="16" height="16" color="#cbd5e1"/>
+<text x="191" y="577" class="nt">Parallel Parser</text>
+<text x="166" y="602" class="ns">Rayon • CIDR/IP ingestion</text>
+<text x="166" y="620" class="ns">Normalize + deduplicate</text>
+
+<rect x="395" y="552" width="235" height="82" fill="#211821" stroke="#fb7185" stroke-width="1.1" class="node"/>
+<circle cx="420" cy="578" r="12" fill="#361923" stroke="#fb7185"/>
+<use href="#icon-db" x="411" y="570" width="17" height="17" color="#fecdd3"/>
+<text x="442" y="577" class="nt">RocksDB + rkyv</text>
+<text x="415" y="602" class="ns">Threat labels / local metadata</text>
+<text x="415" y="620" class="ns">Zero-copy event enrichment</text>
+
+<path d="M265 474H292" class="flowCtl"/>
+<path d="M514 474H487" class="flowThreat"/>
+<path d="M390 509V529H248V552" class="flowThreat"/>
+<path d="M390 509V529H512V552" class="flowThreat"/>
+
+<!-- USER: Static rules -->
+<rect x="736" y="355" width="390" height="184" fill="#0c1929" stroke="#0ea5e9" stroke-width="1.5" class="subpanel"/>
+<circle cx="765" cy="384" r="15" fill="#15243a" stroke="#38bdf8"/>
+<use href="#icon-file" x="754" y="373" width="21" height="21" color="#7dd3fc"/>
+<text x="789" y="380" class="sec">Static Blocklists</text>
+<text x="789" y="402" class="sub">Local CIDR/IP files with automatic hot reload</text>
+
+<rect x="760" y="439" width="150" height="70" fill="#121f31" stroke="#64748b" stroke-width="1.1" class="node"/>
+<circle cx="784" cy="463" r="12" fill="#172338" stroke="#64748b"/>
+<use href="#icon-eye" x="776" y="455" width="16" height="16" color="#cbd5e1"/>
+<text x="805" y="462" class="nt">File Watcher</text>
+<text x="780" y="487" class="ns">notify</text>
+
+<rect x="942" y="439" width="160" height="70" fill="#121f31" stroke="#64748b" stroke-width="1.1" class="node"/>
+<circle cx="966" cy="463" r="12" fill="#172338" stroke="#64748b"/>
+<use href="#icon-load" x="958" y="455" width="16" height="16" color="#cbd5e1"/>
+<text x="987" y="462" class="nt">Rule Loader</text>
+<text x="962" y="487" class="ns">CIDR / IP files</text>
+
+<path d="M910 474H942" class="flowCtl"/>
+
+<!-- USER: Map manager -->
+<rect x="736" y="576" width="390" height="118" fill="#0d2a25" stroke="#10b981" stroke-width="1.7" class="node"/>
+<circle cx="766" cy="610" r="16" fill="#0a3b31" stroke="#10b981"/>
+<use href="#icon-map" x="755" y="598" width="22" height="22" color="#a7f3d0"/>
+<text x="792" y="606" class="nt">eBPF Map Manager</text>
+<text x="762" y="636" class="ns">Builds EXACT + LPM datasets from FireHOL and local rules</text>
+<text x="762" y="657" class="ns">Applies atomic updates to keep XDP lookups consistent</text>
+<text x="762" y="678" class="ns">No packet payload is copied into user space</text>
+
+<path d="M630 593H686V635H736" class="flowSync"/>
+<path d="M1022 509V548H931V576" class="flowSync"/>
+
+<!-- USER: Event & metrics -->
+<rect x="78" y="735" width="1048" height="328" fill="#0b1626" stroke="#334155" stroke-width="1.2" class="subpanel"/>
+<circle cx="108" cy="764" r="15" fill="#2d210c" stroke="#f59e0b"/>
+<use href="#icon-observe" x="97" y="751" width="22" height="22" color="#fde68a"/>
+<text x="132" y="760" class="sec">Events, Enrichment &amp; Observability</text>
+<text x="132" y="782" class="sub">Asynchronous event processing keeps packet handling independent from logging and metrics</text>
+
+<rect x="102" y="828" width="215" height="88" fill="#181b25" stroke="#f59e0b" stroke-width="1.3" class="node"/>
+<circle cx="128" cy="856" r="13" fill="#34230b" stroke="#f59e0b"/>
+<use href="#icon-ringbuf" x="119" y="847" width="18" height="18" color="#fde68a"/>
+<text x="151" y="854" class="nt">RingBuf Consumer</text>
+<text x="122" y="881" class="ns">AsyncFd / epoll</text>
+<text x="122" y="900" class="ns">Consumes 64-byte drop records</text>
+
+<rect x="357" y="828" width="255" height="88" fill="#211821" stroke="#fb7185" stroke-width="1.2" class="node"/>
+<circle cx="383" cy="856" r="13" fill="#361923" stroke="#fb7185"/>
+<use href="#icon-tag" x="374" y="847" width="18" height="18" color="#fecdd3"/>
+<text x="407" y="854" class="nt">Threat Enrichment</text>
+<text x="377" y="881" class="ns">Adds FireHOL list/category metadata</text>
+<text x="377" y="900" class="ns">using RocksDB + rkyv</text>
+
+<rect x="652" y="828" width="205" height="88" fill="#121f31" stroke="#64748b" stroke-width="1.1" class="node"/>
+<circle cx="678" cy="856" r="13" fill="#172338" stroke="#64748b"/>
+<use href="#icon-log" x="669" y="847" width="18" height="18" color="#cbd5e1"/>
+<text x="702" y="854" class="nt">Logs / SIEM</text>
+<text x="672" y="881" class="ns">Console + JSON output</text>
+<text x="672" y="900" class="ns">Structured security events</text>
+
+<rect x="102" y="956" width="215" height="78" fill="#121f31" stroke="#64748b" stroke-width="1.1" class="node"/>
+<circle cx="128" cy="982" r="13" fill="#172338" stroke="#64748b"/>
+<use href="#icon-trophy" x="119" y="969" width="18" height="18" color="#cbd5e1"/>
+<text x="151" y="980" class="nt">Top-100 Aggregator</text>
+<text x="122" y="1007" class="ns">Heavy hitters / counters</text>
+
+<rect x="357" y="956" width="255" height="78" fill="#2b1d08" stroke="#f59e0b" stroke-width="1.3" class="node"/>
+<circle cx="383" cy="982" r="13" fill="#3a2708" stroke="#f59e0b"/>
+<use href="#icon-prometheus" x="373" y="969" width="19" height="19" color="#fde68a"/>
+<text x="407" y="980" class="nt">Prometheus :9100</text>
+<text x="377" y="1007" class="ns">/metrics endpoint</text>
+
+<path d="M317 872H357" class="flowEvt"/>
+<path d="M612 872H652" class="flowThreat"/>
+<path d="M317 995H357" class="flowEvt"/>
+<path d="M512 634V710H484V828" class="flowThreat"/>
+
+<!-- User-side explanatory badges -->
+<rect x="898" y="824" width="190" height="28" rx="14" fill="#0c2d27" stroke="#10b981"/>
+<text x="917" y="843" class="pill" fill="#a7f3d0">ZERO-COPY METADATA</text>
+<rect x="898" y="865" width="190" height="28" rx="14" fill="#211821" stroke="#fb7185"/>
+<text x="922" y="884" class="pill" fill="#fecdd3">ENRICH AFTER DROP</text>
+<rect x="898" y="906" width="190" height="28" rx="14" fill="#2a1d08" stroke="#f59e0b"/>
+<text x="917" y="925" class="pill" fill="#fde68a">ASYNC OBSERVABILITY</text>
+
+<!-- Control-plane dashed links -->
+<path d="M532 314V337H390V439" class="flowCtl"/>
+<path d="M588 314H930V355" class="flowCtl"/>
+
+<!-- KERNEL: Fast path -->
+<rect x="1208" y="224" width="521" height="315" fill="url(#xdpBg)" stroke="#c084fc" stroke-width="1.8" class="subpanel"/>
+<circle cx="1238" cy="254" r="16" fill="#5b21b6" stroke="#e9d5ff"/>
+<use href="#icon-lightning" x="1228" y="242" width="20" height="22" color="#f3e8ff"/>
+<text x="1264" y="250" class="sec">XDP FAST PATH</text>
+<text x="1264" y="272" class="sub">Early packet decision before the regular Linux network stack</text>
+
+<rect x="1235" y="315" width="205" height="88" fill="#151b2c" stroke="#38bdf8" stroke-width="1.4" class="node"/>
+<circle cx="1261" cy="343" r="13" fill="#12324f" stroke="#38bdf8"/>
+<use href="#icon-nic" x="1252" y="334" width="18" height="18" color="#7dd3fc"/>
+<text x="1285" y="341" class="nt">NIC / RX Ring</text>
+<text x="1255" y="369" class="ns">Incoming Ethernet traffic</text>
+<text x="1255" y="388" class="ns">Packets arrive from the driver</text>
+
+<rect x="1480" y="315" width="220" height="88" fill="#4c1d78" stroke="#e9d5ff" stroke-width="1.4" class="node"/>
+<circle cx="1506" cy="343" r="13" fill="#6d28d9" stroke="#e9d5ff"/>
+<use href="#icon-ebpf" x="1497" y="334" width="18" height="18" color="#f3e8ff"/>
+<text x="1530" y="341" class="nt">Ingress XDP Hook</text>
+<text x="1500" y="369" class="ns">Aya eBPF program</text>
+<text x="1500" y="388" class="ns">Early firewall decision point</text>
+
+<path d="M1440 359H1480" class="flowNet"/>
+
+<rect x="1235" y="438" width="465" height="74" fill="#2d174a" stroke="#d8b4fe" stroke-width="1.1" rx="13"/>
+<text x="1258" y="465" class="nt">Fast-path decision order</text>
+<text x="1258" y="490" class="ns">1. exact IP lookup   →   2. CIDR LPM fallback   →   3. emit drop event   →   4. increment stats</text>
+
+<!-- KERNEL: Maps -->
+<rect x="1208" y="578" width="521" height="460" fill="#071f1b" stroke="#10b981" stroke-width="1.6" class="subpanel"/>
+<circle cx="1238" cy="608" r="16" fill="#0a3b31" stroke="#10b981"/>
+<use href="#icon-map" x="1227" y="592" width="22" height="22" color="#a7f3d0"/>
+<text x="1264" y="604" class="sec">Kernel eBPF Maps</text>
+<text x="1264" y="626" class="sub">Shared state used by XDP and synchronized atomically from user space</text>
+
+<rect x="1235" y="670" width="210" height="108" fill="url(#mapBg)" stroke="#10b981" stroke-width="1.3" class="node"/>
+<circle cx="1261" cy="698" r="13" fill="#0a3b31" stroke="#10b981"/>
+<use href="#icon-target" x="1252" y="689" width="18" height="18" color="#a7f3d0"/>
+<text x="1285" y="696" class="nt">EXACT_MAP</text>
+<text x="1255" y="724" class="ns">IPv4 / IPv6 • HASH</text>
+<text x="1255" y="745" class="ns">/32 and /128 exact match</text>
+<text x="1255" y="764" class="ns">Expected O(1) lookup</text>
+
+<rect x="1490" y="670" width="210" height="108" fill="url(#mapBg)" stroke="#10b981" stroke-width="1.3" class="node"/>
+<circle cx="1516" cy="698" r="13" fill="#0a3b31" stroke="#10b981"/>
+<use href="#icon-lpm" x="1507" y="689" width="18" height="18" color="#a7f3d0"/>
+<text x="1540" y="696" class="nt">LPM_MAP</text>
+<text x="1510" y="724" class="ns">IPv4 / IPv6 • LPM_TRIE</text>
+<text x="1510" y="745" class="ns">CIDR longest-prefix match</text>
+<text x="1510" y="764" class="ns">Used when exact lookup misses</text>
+
+<rect x="1235" y="822" width="210" height="108" fill="url(#mapBg)" stroke="#10b981" stroke-width="1.3" class="node"/>
+<circle cx="1261" cy="850" r="13" fill="#34230b" stroke="#f59e0b"/>
+<use href="#icon-ringbuf" x="1252" y="837" width="18" height="18" color="#fde68a"/>
+<text x="1285" y="848" class="nt">EVENTS RingBuf</text>
+<text x="1255" y="876" class="ns">BPF_MAP_TYPE_RINGBUF</text>
+<text x="1255" y="897" class="ns">64-byte drop records</text>
+<text x="1255" y="916" class="ns">Asynchronous consumption</text>
+
+<rect x="1490" y="822" width="210" height="108" fill="url(#mapBg)" stroke="#10b981" stroke-width="1.3" class="node"/>
+<circle cx="1516" cy="850" r="13" fill="#34230b" stroke="#f59e0b"/>
+<use href="#icon-stats" x="1507" y="837" width="18" height="18" color="#fde68a"/>
+<text x="1540" y="848" class="nt">STATS Map</text>
+<text x="1510" y="876" class="ns">BPF_MAP_TYPE_ARRAY</text>
+<text x="1510" y="897" class="ns">Atomic counters</text>
+<text x="1510" y="916" class="ns">Low-overhead telemetry</text>
+
+<!-- XDP internal flows -->
+<path d="M1590 403V638H1340V670" class="flowLookup"/>
+<path d="M1590 403V638H1595V670" class="flowLookup"/>
+<path d="M1590 403V795H1340V822" class="flowEvt"/>
+<path d="M1590 403V795H1595V822" class="flowEvt"/>
+
+<!-- Outcome -->
+<rect x="1208" y="1072" width="521" height="104" fill="#11172a" stroke="#64748b" stroke-width="1.1" class="subpanel"/>
+<circle cx="1238" cy="1102" r="16" fill="#341421" stroke="#fb7185"/>
+<use href="#icon-shield" x="1228" y="1089" width="21" height="21" color="#fecdd3"/>
+<text x="1264" y="1098" class="sec">Packet Outcome</text>
+<text x="1264" y="1122" class="sub">Match → XDP_DROP + event + counter</text>
+<text x="1264" y="1143" class="sub">No match → packet continues through the normal network stack</text>
+<rect x="1264" y="1152" width="128" height="20" rx="10" fill="#3a1020" stroke="#fb7185"/>
+<text x="1284" y="1166" class="micro" fill="#fecdd3">FAST DROP</text>
+<rect x="1406" y="1152" width="244" height="20" rx="10" fill="#0b2f29" stroke="#10b981"/>
+<text x="1432" y="1166" class="micro" fill="#a7f3d0">NO PACKET COPY TO USER SPACE</text>
+
+<!-- Cross-space links, routed in whitespace -->
+<path d="M1126 622H1170V724H1235" class="flowSync"/>
+<path d="M1126 652H1160V724H1490" class="flowSync"/>
+
+<path d="M1235 876H1174V1110H70V872H102" class="flowEvt"/>
+<path d="M1490 876H1188V1132H90V995H102" class="flowEvt"/>
+
+<!-- Small cross-space labels as pills -->
+<rect x="1088" y="586" width="123" height="23" rx="11.5" fill="#092b25" stroke="#10b981"/>
+<text x="1104" y="602" class="micro" fill="#a7f3d0">ATOMIC MAP SYNC</text>
+
+<rect x="900" y="1077" width="165" height="23" rx="11.5" fill="#2c200b" stroke="#f59e0b"/>
+<text x="918" y="1093" class="micro" fill="#fde68a">RINGBUF → ASYNCFD</text>
+
+<rect x="900" y="1110" width="165" height="23" rx="11.5" fill="#2c200b" stroke="#f59e0b"/>
+<text x="925" y="1126" class="micro" fill="#fde68a">STATS TELEMETRY</text>
+
+<!-- Legend -->
+<rect x="48" y="1222" width="1704" height="64" rx="14" fill="#0d1422" stroke="#334155" stroke-width="1"/>
+<text x="70" y="1260" class="micro">FLOW LEGEND</text>
+
+<line x1="178" y1="1254" x2="226" y2="1254" class="flowNet"/>
+<text x="238" y="1259" class="micro">network traffic</text>
+
+<line x1="372" y1="1254" x2="420" y2="1254" class="flowSync"/>
+<text x="432" y="1259" class="micro">map synchronization</text>
+
+<line x1="608" y1="1254" x2="656" y2="1254" class="flowEvt"/>
+<text x="668" y="1259" class="micro">events / telemetry</text>
+
+<line x1="829" y1="1254" x2="877" y2="1254" class="flowThreat"/>
+<text x="889" y="1259" class="micro">threat data / enrichment</text>
+
+<line x1="1105" y1="1254" x2="1153" y2="1254" class="flowLookup"/>
+<text x="1165" y="1259" class="micro">XDP lookup</text>
+
+<line x1="1322" y1="1254" x2="1370" y2="1254" class="flowCtl"/>
+<text x="1382" y="1259" class="micro">control-plane orchestration</text>
+</svg>

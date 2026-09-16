@@ -1,0 +1,16 @@
+# ==============================================================================
+# 📊 Grafana Dashboards Provisioning - Automatic Dashboard Loading 🛡️
+# ==============================================================================
+apiVersion: 1
+
+providers:
+  - name: "eBPF Firewall"
+    orgId: 1
+    folder: "eBPF Firewall"
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: false

@@ -1,0 +1,105 @@
+[workspace]
+members = [
+    ".",
+    "firewall-common",
+    "scripts",
+    "xtask",
+]
+exclude = [
+    "firewall-ebpf",
+]
+resolver = "2"
+
+[package]
+name = "firewall"
+version = "0.1.0"
+edition = "2021"
+authors = ["Firewall Team"]
+description = "High-Performance eBPF IP Reputation Ingress Firewall"
+
+[lib]
+name = "firewall_lib"
+path = "src/lib.rs"
+bench = false
+
+[[bin]]
+name = "firewall"
+path = "src/main.rs"
+bench = false
+
+[dependencies]
+firewall-common = { path = "firewall-common", features = ["std", "serde", "aya"] }
+aya = "0.14.0"
+aya-log = "0.3.0"
+tokio = { version = "1.43", features = ["full"] }
+clap = { version = "4.5", features = ["derive", "env", "color"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt", "ansi"] }
+thiserror = "2.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+ipnet = { version = "2.11", features = ["serde"] }
+bytes = "1.10"
+libc = "0.2"
+notify = "8.0"
+prometheus = "0.14"
+pretty-console = "1.0.3"
+git2 = { version = "0.21.0", features = ["https"] }
+chrono = "0.4.45"
+tokio-cron-scheduler = "0.15.1"
+uuid = { version = "1.10", features = ["v4"] }
+tikv-jemallocator = "0.7.0"
+rkyv = { version = "0.8", default-features = false, features = ["std", "alloc", "bytecheck", "unaligned"] }
+
+# rocksdb is defined per-target: io-uring requires liburing via pkg-config, which is
+# not available when cross-compiling to a static (musl) target, so it is only enabled
+# for native Linux builds.
+[target.'cfg(all(target_os = "linux", not(target_env = "musl")))'.dependencies]
+rocksdb = {
+    version = "0.25.0",
+    default-features = false,
+    features = [
+        "lz4",
+        "jemalloc",
+        "lto",
+        "io-uring",
+    ]
+}
+
+[target.'cfg(any(not(target_os = "linux"), target_env = "musl"))'.dependencies]
+rocksdb = {
+    version = "0.25.0",
+    default-features = false,
+    # `lto` and `io-uring` are intentionally omitted here:
+    # - `lto` is only accepted by librocksdb-sys when the C/C++ compiler is clang,
+    #   while the fully-static musl build uses the gcc-based musl-cross toolchain;
+    # - `io-uring` pulls in liburing via pkg-config, which is unavailable when
+    #   cross-compiling to a static (musl) target.
+    features = [
+        "lz4",
+        "jemalloc",
+    ]
+}
+
+[dev-dependencies]
+criterion = { version = "0.8.2", features = ["html_reports"] }
+tempfile = "3.16"
+
+[[bench]]
+name = "lookup_benchmark"
+harness = false
+
+[[bench]]
+name = "firehol_benchmark"
+harness = false
+
+[[bench]]
+name = "rocksdb_benchmark"
+harness = false
+
+[profile.release]
+opt-level = 3            # Maximum optimization for speed (default for release)
+lto = "fat"              # Full/fat LTO: best cross-crate optimization
+codegen-units = 1        # Single codegen unit: more optimization opportunities
+panic = "abort"          # No unwinding; smaller, slightly faster code
+strip = true             # Strip symbols to reduce binary size (optional for speed/size)

@@ -1,0 +1,15 @@
+# ==============================================================================
+# 🛡️ Prometheus Configuration for eBPF IP Reputation Firewall 🦀
+# ==============================================================================
+global:
+  scrape_interval: 2s      # High-frequency scraping for real-time packet telemetry
+  evaluation_interval: 2s  # Rule evaluation frequency
+
+scrape_configs:
+  - job_name: "ebpf-firewall"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets: ["ebpf-firewall:9100"]
+        labels:
+          service: "ebpf-firewall"
+          environment: "production"

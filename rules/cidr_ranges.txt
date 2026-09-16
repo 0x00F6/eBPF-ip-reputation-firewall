@@ -1,0 +1,12 @@
+# ==============================================================================
+# eBPF Firewall Reputation Blocklist - CIDR Aggregates
+# ==============================================================================
+# Tested via BPF LPM Trie (Longest Prefix Match)
+# ==============================================================================
+
+# Private / Bogon IP ranges (for perimeter ingress enforcement)
+10.0.0.0/8          # RFC 1918 Class A Private Network
+# 172.16.0.0/12     # RFC 1918 Class B (commented out to allow Docker bridge test network 172.28.0.0/16)
+192.168.0.0/16      # RFC 1918 Class C Private Network
+169.254.0.0/16      # RFC 3927 Link-Local Network
+224.0.0.0/4         # RFC 5771 Multicast Network (ingress drop)

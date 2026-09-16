@@ -1,0 +1,18 @@
+# ==============================================================================
+# eBPF Firewall Reputation Blocklist - IPv6 Rules
+# ==============================================================================
+# Syntax:
+#   - Single IPv6 address: e.g. 2001:db8::1 (stored in O(1) BPF HashMap)
+#   - Single IPv6 with /128: e.g. 2001:db8::cafe/128 (stored in O(1) BPF HashMap)
+#   - IPv6 CIDR subnet: e.g. 2001:db8:evil::/48 (stored in BPF LPM Trie)
+# ==============================================================================
+
+# Exact IPv6 Threat Actors
+2001:db8:ffff::1         # Command & Control Node
+2001:db8:beef::dead      # Syn Flood source
+2001:db8:bad:c0de::12    # Scanning botnet controller
+
+# Malicious IPv6 Network Ranges (LPM Trie)
+2001:db8:bad::/48        # Malicious ASN IPv6 Allocation
+2001:db8:666::/40        # Known bulletproof hosting IPv6 block
+2001:db8:9999::/64       # Compromised datacenter rack subnet

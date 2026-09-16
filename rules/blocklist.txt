@@ -1,0 +1,28 @@
+# ==============================================================================
+# eBPF Firewall Reputation Blocklist - IPv4 Rules
+# ==============================================================================
+# Syntax:
+#   - Single IPv4 address: e.g. 198.51.100.42 (stored in O(1) BPF HashMap)
+#   - Single IPv4 with /32: e.g. 203.0.113.195/32 (automatically stored in O(1) BPF HashMap)
+#   - IPv4 CIDR subnet: e.g. 198.18.0.0/15 (stored in BPF LPM Trie)
+#   - Comments start with '#' and can be inline
+# ==============================================================================
+
+# Known C2 and Scanner IP Addresses (Exact Match -> HashMap)
+198.51.100.14       # Mirai Botnet scanner node
+198.51.100.27       # SSH Brute-force attacker
+203.0.113.42        # Cobalt Strike TeamServer
+203.0.113.99        # Distributed Port Scanner
+192.0.2.66          # Malicious Log4j payload injector
+192.0.2.128         # Compromised relay proxy
+
+# Malicious Subnets and Threat Actor IP Ranges (CIDR Match -> LPM Trie)
+198.51.100.0/24     # Documentation / Simulated Rogue AS Subnet
+203.0.113.0/26      # Malicious Hosting Provider range
+192.0.2.0/25        # Bulletproof VPS provider network
+100.64.0.0/16       # Carrier-grade NAT rogue partition
+
+# Local Testing Entries (loopback & private ranges for verification)
+127.0.0.100/32      # Loopback test attacker address
+127.0.0.200         # Loopback test scanner address
+
